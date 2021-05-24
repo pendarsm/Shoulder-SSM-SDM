@@ -1,20 +1,11 @@
 % Developed by Pendar Soltanmohammadi, Western University, London, ON, Canada
 % This program takes modes of variation as input and returns the resulting geometry. 
 function Humerus_SSM(input)
+global SD coeff Ave elements
 
-load 'Data_Shape_Humerus.mat'
-load 'PC_Sign_Humerus_Shape.mat'
-load 'Elements.mat'
+%input vector (modes of variation) should be described by perturbing the mean shape by +/- desired standard deviations (e.g. +1 standard deviation) for each of the first 5 (significant) principal components (PCs).
+score_input = input .* SD(1,1:length(input));
 
-[coeff,score,~,~,~,~] = pca(data_matrix);
-
-score_input = zeros(size(input));
-for i=1:length(input)
-    
- score_input(i) = input(i)*pc_sign_humerus_shape(i)*std(score(:,i));   
-    
-end
-
-nodes = reshape((score_input*coeff(:,1:length(input))'+mean(data_matrix)), 3, []);
+nodes = reshape((score_input * coeff(:,1:length(input))' + Ave), 3, []);
 Write_VTK_Shape('Humerus_SSM_Output.vtk', nodes, elements);
 end
